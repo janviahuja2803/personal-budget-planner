@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Login from '../components/Login';
-import Signup from '../components/SignUp';
+import Signup from '../components/Signup';
 import PersonalBudgetPlanner from '../components/PersonalBudgetPlanner';
 
 export default function Home() {
