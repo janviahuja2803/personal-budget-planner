@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Papa, { ParseResult } from 'papaparse';
+import Papa from 'papaparse';
 
 interface Expense {
   amount: number;
@@ -54,8 +54,8 @@ export default function UploadBankStatement({ onUploadExpenses }: Props) {
       Papa.parse(csv, {
         header: true,
         skipEmptyLines: true,
-        complete: function (results: { data: any[] }) {
-          const cleanedData = results.data.map((row: { amount: string; category?: string; description?: string }) => ({
+        complete: function (results: { data: { amount: string; category?: string; description?: string }[] }) {
+          const cleanedData = results.data.map((row) => ({
             amount: parseFloat(row.amount),
             category: row.category || guessCategory(row.description || ''),
             description: row.description || '',
