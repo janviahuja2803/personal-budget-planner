@@ -1,82 +1,82 @@
-import React, { useState } from 'react'
-import Papa from 'papaparse'
+import React, { useState } from 'react';
+import Papa from 'papaparse';
 
 interface Expense {
-  amount: number
-  category: string
-  description?: string
+  amount: number;
+  category: string;
+  description?: string;
 }
 
 interface Props {
-  onUploadExpenses: (uploaded: Expense[]) => void
+  onUploadExpenses: (uploaded: Expense[]) => void;
 }
 
 export default function UploadBankStatement({ onUploadExpenses }: Props) {
-  const [file, setFile] = useState<File | null>(null)
-  const [status, setStatus] = useState('')
-  const [parsedData, setParsedData] = useState<Expense[]>([])
-  const [confirmed, setConfirmed] = useState(false)
+  const [file, setFile] = useState<File | null>(null);
+  const [status, setStatus] = useState('');
+  const [parsedData, setParsedData] = useState<Expense[]>([]);
+  const [confirmed, setConfirmed] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
-      setStatus('')
-      setParsedData([])
-      setConfirmed(false)
+      setFile(e.target.files[0]);
+      setStatus('');
+      setParsedData([]);
+      setConfirmed(false);
     }
-  }
+  };
 
   const guessCategory = (description: string): string => {
-    const desc = description.toLowerCase()
+    const desc = description.toLowerCase();
 
-    if (desc.includes('uber') || desc.includes('lyft')) return 'Transport'
-    if (desc.includes('walmart') || desc.includes('aldi') || desc.includes('grocery')) return 'Groceries'
-    if (desc.includes('netflix') || desc.includes('spotify') || desc.includes('movie')) return 'Entertainment'
-    if (desc.includes('amazon') || desc.includes('target') || desc.includes('apple.com') || desc.includes('itunes')) return 'Shopping'
-    if (desc.includes('doctor') || desc.includes('pharmacy') || desc.includes('hospital')) return 'Health & Wellness'
-    if (desc.includes('starbucks') || desc.includes('cafe') || desc.includes('restaurant')) return 'Dining Out'
-    if (desc.includes('comcast') || desc.includes('pg&e') || desc.includes('utility')) return 'Bills & Utilities'
-    if (desc.includes('gym') || desc.includes('fitness')) return 'Health & Wellness'
+    if (desc.includes('uber') || desc.includes('lyft')) return 'Transport';
+    if (desc.includes('walmart') || desc.includes('aldi') || desc.includes('grocery')) return 'Groceries';
+    if (desc.includes('netflix') || desc.includes('spotify') || desc.includes('movie')) return 'Entertainment';
+    if (desc.includes('amazon') || desc.includes('target') || desc.includes('apple.com') || desc.includes('itunes')) return 'Shopping';
+    if (desc.includes('doctor') || desc.includes('pharmacy') || desc.includes('hospital')) return 'Health & Wellness';
+    if (desc.includes('starbucks') || desc.includes('cafe') || desc.includes('restaurant')) return 'Dining Out';
+    if (desc.includes('comcast') || desc.includes('pg&e') || desc.includes('utility')) return 'Bills & Utilities';
+    if (desc.includes('gym') || desc.includes('fitness')) return 'Health & Wellness';
 
-    return 'Other'
-  }
+    return 'Other';
+  };
 
   const handleUpload = () => {
     if (!file) {
-      setStatus('❗ Please select a file to upload.')
-      return
+      setStatus('❗ Please select a file to upload.');
+      return;
     }
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (e) => {
-      const csv = e.target?.result as string
+      const csv = e.target?.result as string;
 
       Papa.parse(csv, {
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
-          const cleanedData = results.data.map((row: any) => ({
+          const cleanedData = results.data.map((row: { amount: string; category?: string; description?: string }) => ({
             amount: parseFloat(row.amount),
             category: row.category || guessCategory(row.description || ''),
             description: row.description || '',
-          }))
-          setParsedData(cleanedData)
-          setStatus('✅ CSV parsed. Preview below before confirming.')
+          }));
+          setParsedData(cleanedData);
+          setStatus('✅ CSV parsed. Preview below before confirming.');
         },
         error: function (err) {
-          setStatus(`❌ Error parsing CSV: ${err.message}`)
-        }
-      })
-    }
+          setStatus(`❌ Error parsing CSV: ${err.message}`);
+        },
+      });
+    };
 
-    reader.readAsText(file)
-  }
+    reader.readAsText(file);
+  };
 
   const handleConfirm = () => {
-    onUploadExpenses(parsedData)
-    setConfirmed(true)
-    setStatus('✅ Expenses added to your dashboard!')
-  }
+    onUploadExpenses(parsedData);
+    setConfirmed(true);
+    setStatus('✅ Expenses added to your dashboard!');
+  };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl transition-all">
@@ -104,18 +104,24 @@ export default function UploadBankStatement({ onUploadExpenses }: Props) {
       </button>
 
       {status && (
-        <p className={`mt-4 text-sm font-medium ${
-          status.startsWith('✅') ? 'text-green-600' :
-          status.startsWith('❗') ? 'text-yellow-600' :
-          'text-red-600'
-        }`}>
+        <p
+          className={`mt-4 text-sm font-medium ${
+            status.startsWith('✅')
+              ? 'text-green-600'
+              : status.startsWith('❗')
+              ? 'text-yellow-600'
+              : 'text-red-600'
+          }`}
+        >
           {status}
         </p>
       )}
 
       {parsedData.length > 0 && !confirmed && (
         <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2 text-gray-800">📋 Preview Parsed Expenses:</h3>
+          <h3 className="text-lg font-semibold mb-2 text-gray-800">
+            📋 Preview Parsed Expenses:
+          </h3>
           <table className="w-full text-left border border-gray-200 rounded overflow-hidden">
             <thead className="bg-gray-100 text-sm text-gray-700">
               <tr>
@@ -144,5 +150,5 @@ export default function UploadBankStatement({ onUploadExpenses }: Props) {
         </div>
       )}
     </div>
-  )
+  );
 }
