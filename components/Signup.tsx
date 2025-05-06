@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link'; // ✅ Import Link for internal routing
 
 interface SignupProps {
   onSignupSuccess: () => void;
@@ -63,9 +64,9 @@ export default function Signup({ onSignupSuccess }: SignupProps) {
 
         <p className="mt-4 text-sm text-center">
           Already have an account?{' '}
-          <a href="/" className="text-blue-500 hover:underline">
-            Log in
-          </a>
+          <Link href="/" legacyBehavior>
+            <a className="text-blue-500 hover:underline">Log in</a>
+          </Link>
         </p>
       </div>
     </div>
